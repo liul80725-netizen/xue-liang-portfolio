@@ -23,7 +23,13 @@ jobs:
       - name: Unpack site
         run: |
           mkdir -p _site
-          unzip -q site.zip -d _site
+          python - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('site.zip') as archive:
+              for item in archive.infolist():
+                  item.filename = item.filename.replace('\\', '/')
+                  archive.extract(item, '_site')
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
